@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+import sys
+
+from helpers.help import *
+from helpers.encrypt import *
+from helpers.decrypt import *
+from helpers.matrix import *
+from helpers.error import *
+from helpers.display import *
+
+# syntax: ./103cipher message key flag
+
+def encrypt(msg, key):
+    matrix_key = arr_to_matrix(transcript_in_ascii(key))
+    encrypted_matrix = str_to_encrypted_matrix(msg, key)
+    display_encrypted(encrypted_matrix, matrix_key)
+
+def decrypt(msg, key):
+    matrix_key = arr_to_matrix(transcript_in_ascii(key))
+    matrix_msg = str_to_matrix(msg, len(matrix_key))
+    try:
+        key_inv = inverse_matrix(matrix_key)
+    except:
+        print("The key doesn't have an inverse")
+        exit(84)
+    if (key_inv == None):
+        print("The key doesn't have an inverse")
+        exit(84)
+    try:
+        decrypted_matrix = decrypt_matrix(matrix_msg, key_inv)
+    except:
+        print("The message cannot be decrypted")
+        exit(84)
+    if (check_decrypted_matrix(decrypted_matrix) == False):
+        print("The message cannot be decrypted")
+        exit(84)
+    display_decrypted(decrypted_matrix, key_inv)
+
+def main():
+    check_args()
+    msg = sys.argv[1]
+    key = sys.argv[2]
+
+    if (int(sys.argv[3]) == 0):
+        encrypt(msg, key)
+    else:
+        decrypt(msg, key)
+
+if __name__ == "__main__":
+    main()
